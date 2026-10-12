@@ -107,5 +107,28 @@ Des boutons de remplissage rapide "Client Démo" et "Admin Démo" sont égalemen
 3. Dans **Database Access**, créez un utilisateur avec mot de passe.
 4. Dans **Network Access**, autorisez l'adresse IP (`0.0.0.0/0` pour le cloud).
 5. Cliquez sur **Connect** > **Drivers** et copiez votre chaîne de connexion.
-6. Renseignez-la dans `MONGODB_URI` dans votre fichier `.env`.
+6. Renseignez-la dans `MONGODB_URI` dans vos secrets Google AI Studio ou votre fichier `.env`.
 Au démarrage, Crystal Rent Car détecte automatiquement votre cluster Atlas et synchronise la flotte et les réservations.
+
+---
+
+## 6. Déploiement sur Google Cloud Run via Google AI Studio
+
+L'application est configurée pour le flux de déploiement officiel Google AI Studio vers Google Cloud Run :
+
+1. **Variables & Secrets d'Environnement :**
+   Dans le panneau **Secrets / Environment Variables** de Google AI Studio :
+   - `GEMINI_API_KEY` : Clé Gemini API (fournie automatiquement par Google AI Studio)
+   - `MONGODB_URI` : URI de connexion MongoDB Atlas (optionnel, active la persistance cloud distribuée)
+   - `JWT_SECRET` : Clé secrète de signature des tokens (ex: `crystal_rent_car_jwt_super_secret_key_2026`)
+
+2. **Démarrage & Santé Cloud Run :**
+   - Script de démarrage : `npm run start` qui exécute `node server.ts`
+   - Écoute dynamique sur le port injecté : `process.env.PORT` (ex: 8080)
+   - Liaison IP : `0.0.0.0`
+   - Sondes de santé : `/healthz`, `/api/health`, et `/api/v1/health` répondent directement avec un code HTTP `200 OK`
+
+3. **Étapes de Publication :**
+   - Cliquez sur le bouton **Publish** en haut à droite de l'interface Google AI Studio.
+   - Le système construit le conteneur (`npm run build`) et déploie le service sur Google Cloud Run.
+   - Votre application sera accessible via l'URL Cloud Run publique générée.

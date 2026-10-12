@@ -409,6 +409,55 @@ export const AdminDashboardPage: React.FC = () => {
         {/* TAB 1: OVERVIEW METRICS & CHARTS */}
         {activeTab === 'overview' && (
           <div className="space-y-8">
+            {/* MongoDB Atlas Status Card */}
+            <div
+              className={`p-4 sm:p-5 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 ${
+                dbHealth?.database?.isAtlasConnected
+                  ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-200'
+                  : 'bg-amber-950/20 border-amber-500/30 text-amber-200'
+              }`}
+            >
+              <div className="flex items-start gap-3.5">
+                <div
+                  className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                    dbHealth?.database?.isAtlasConnected
+                      ? 'bg-emerald-500/20 text-emerald-400'
+                      : 'bg-amber-500/20 text-amber-400'
+                  }`}
+                >
+                  <Database className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                    <span>État de la Base de Données MongoDB :</span>
+                    {dbHealth?.database?.isAtlasConnected ? (
+                      <span className="text-emerald-400 font-extrabold text-xs">Atlas Connecté</span>
+                    ) : (
+                      <span className="text-amber-400 font-extrabold text-xs">Mode Local Résilient</span>
+                    )}
+                  </h4>
+                  <p className="text-xs text-gray-300 mt-1 max-w-2xl leading-relaxed">
+                    {dbHealth?.database?.isAtlasConnected ? (
+                      `Connecté au cluster MongoDB Atlas (${dbHealth.database.host}). Toutes les opérations sont persistées en direct.`
+                    ) : (
+                      <span>
+                        L'application fonctionne actuellement avec le magasin local résilient. Pour synchroniser avec votre cluster <strong>MongoDB Atlas</strong>, renseignez le secret <code>MONGODB_URI</code> dans les paramètres de déploiement Google AI Studio / Cloud Run.
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              {!dbHealth?.database?.isAtlasConnected && (
+                <button
+                  onClick={() => setActiveTab('settings')}
+                  className="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-semibold whitespace-nowrap transition border border-amber-500/30"
+                >
+                  Guide de Configuration
+                </button>
+              )}
+            </div>
+
             {/* KPI Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="p-5 rounded-2xl bg-[#131722] border border-white/10 space-y-2">
@@ -906,9 +955,31 @@ export const AdminDashboardPage: React.FC = () => {
 
         {/* TAB 5: AGENCY SETTINGS & PRICING */}
         {activeTab === 'settings' && agencySettings && (
-          <div className="max-w-3xl rounded-2xl bg-[#131722] border border-white/10 p-8 space-y-6">
-            <h2 className="text-lg font-bold text-white">Paramètres Généraux de l'Agence</h2>
-            <form onSubmit={handleSaveSettings} className="space-y-6 text-xs">
+          <div className="max-w-3xl space-y-6">
+            {/* MongoDB Atlas Configuration Guide */}
+            <div className="rounded-2xl bg-[#10141d] border border-[#d4af37]/30 p-6 space-y-3">
+              <div className="flex items-center gap-2.5">
+                <Database className="w-5 h-5 text-[#d4af37]" />
+                <h3 className="text-sm font-bold text-white">Connexion MongoDB Atlas (Production)</h3>
+              </div>
+              <p className="text-xs text-gray-300 leading-relaxed">
+                Pour connecter votre propre cluster MongoDB Atlas à Crystal Rent Car :
+              </p>
+              <ol className="list-decimal list-inside space-y-1.5 text-xs text-gray-300 bg-white/5 p-4 rounded-xl border border-white/5">
+                <li>Créez un cluster gratuit sur <strong>MongoDB Atlas</strong> (ex: cluster M0).</li>
+                <li>Dans <strong>Database Access</strong>, créez un utilisateur avec mot de passe.</li>
+                <li>Dans <strong>Network Access</strong>, autorisez l'accès IP (<code>0.0.0.0/0</code> pour Cloud Run).</li>
+                <li>Cliquez sur <strong>Connect</strong> &gt; <strong>Drivers</strong> et copiez votre URI.</li>
+                <li>Ajoutez la variable ou secret <code>MONGODB_URI</code> dans les paramètres de déploiement de l'application.</li>
+              </ol>
+              <div className="text-[11px] text-gray-400 font-mono bg-black/40 p-2.5 rounded-lg border border-white/5 overflow-x-auto">
+                MONGODB_URI="mongodb+srv://&lt;username&gt;:&lt;password&gt;@cluster0.mongodb.net/crystal_rent_car?retryWrites=true&w=majority"
+              </div>
+            </div>
+
+            <div className="rounded-2xl bg-[#131722] border border-white/10 p-8 space-y-6">
+              <h2 className="text-lg font-bold text-white">Paramètres Généraux de l'Agence</h2>
+              <form onSubmit={handleSaveSettings} className="space-y-6 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-gray-300 font-semibold mb-1">Nom commercial</label>
@@ -1007,7 +1078,8 @@ export const AdminDashboardPage: React.FC = () => {
               </div>
             </form>
           </div>
-        )}
+        </div>
+      )}
 
         {/* TAB 6: REPORTS & AUDIT */}
         {activeTab === 'reports' && (

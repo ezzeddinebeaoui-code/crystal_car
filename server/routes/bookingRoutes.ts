@@ -1,4 +1,5 @@
-import { Router, Request, Response } from 'express';
+import { Router } from 'express';
+import type { Request, Response } from 'express';
 import { z } from 'zod';
 import { dbStore } from '../services/dbStore.ts';
 import { authenticate, optionalAuth } from '../middleware/auth.ts';
