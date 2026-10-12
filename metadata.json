@@ -1,0 +1,6 @@
+{
+  "name": "Crystal Rent Car - Location de Voitures en Tunisie",
+  "description": "Plateforme premium de location de voitures en Tunisie. Réservation en temps réel, flotte exclusive, Crystal Assistant IA et espace d'administration complet.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
